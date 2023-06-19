@@ -1,15 +1,32 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
+import React from 'react';
+import reactLogo from './assets/react.svg';
+import { invoke } from '@tauri-apps/api/tauri';
+import { appWindow } from '@tauri-apps/api/window';
+import './App.css';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [greetMsg, setGreetMsg] = React.useState('');
+  const [name, setName] = React.useState('');
+
+  React.useEffect(() => {
+    (async () => {
+      //? This never fires on the appearance change
+      const unlisten = await appWindow.onThemeChanged(({ payload: theme }) => {
+        console.log(theme);
+      });
+
+      return unlisten();
+    })();
+
+    //? This will, uncomment to see
+    // appWindow.onThemeChanged(({ payload: theme }) => {
+    //   console.log(theme);
+    // });
+  }, []);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+    setGreetMsg(await invoke('greet', { name }));
   }
 
   return (
